@@ -1,0 +1,42 @@
+# player.py in src/game_engine
+import pyglet
+import os
+import math
+
+class Player:
+    def __init__(self):
+        print("Initializing Player")
+        script_dir = os.path.dirname(__file__)
+        assets_dir = os.path.join(script_dir, '../../assets/images')
+        ship_image_path = os.path.join(assets_dir, 'pirateship.png')
+        self.ship_image = pyglet.image.load(ship_image_path)
+        self.sprite = pyglet.sprite.Sprite(self.ship_image, x=400, y=300)
+        self.sprite.scale = 0.5  # Adjust the scale as necessary
+
+        self.rotation_speed = 150  # Degrees per second
+        self.speed = 0
+        self.acceleration = 50  # Pixels per second squared
+        self.max_speed = 300  # Maximum speed in pixels per second
+
+        self.x = 400
+        self.y = 300
+
+    def update(self, dt, keys):
+        if keys[pyglet.window.key.A]:
+            self.sprite.rotation += self.rotation_speed * dt
+        if keys[pyglet.window.key.D]:
+            self.sprite.rotation -= self.rotation_speed * dt
+
+        if keys[pyglet.window.key.W]:
+            self.speed += self.acceleration * dt
+        else:
+            self.speed = max(0, self.speed - self.acceleration * dt)
+
+        self.speed = max(0, min(self.speed, self.max_speed))
+
+        angle_radians = -math.radians(self.sprite.rotation)
+        self.sprite.x += self.speed * math.cos(angle_radians) * dt
+        self.sprite.y += self.speed * math.sin(angle_radians) * dt
+
+    def draw(self):
+        self.sprite.draw()
